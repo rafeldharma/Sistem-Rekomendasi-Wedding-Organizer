@@ -67,10 +67,10 @@ with tab1:
 # --- HEADER SECTION (Update sesuai image_a473b5.png) ---
     st.markdown("""
         <div style='text-align: center; padding-top: 10px;'>
-            <h1 style='font-size: 50px; font-weight: 700; color: #1E1E1E; margin-bottom: 0px;'>
+            <h1 style='font-size: 50px; font-weight: 700; margin-bottom: 0px;'>
                 💍 Plan Your Dream Wedding
             </h1>
-            <p style='font-size: 20px; color: #666; margin-top: 5px; font-weight: 400;'>
+            <p style='font-size: 20px; margin-top: 5px; font-weight: 400;'>
                 Sistem Rekomendasi Vendor Wedding Organizer
             </p>
         </div>
