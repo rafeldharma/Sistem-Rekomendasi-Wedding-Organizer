@@ -2,17 +2,16 @@ import streamlit as st
 import pandas as pd
 import re
 
-# --- FUNGSI HELPER ---
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
 def parse_angka(teks):
     return int(re.sub(r'\D', '', teks)) if teks else 0
 
-# --- KONFIGURASI HALAMAN ---
+# KONFIGURASI HALAMAN
 st.set_page_config(page_title="Rekomendasi WO - Rafel", layout="wide")
 
-# CSS untuk menyembunyikan sidebar dan mempercantik tampilan
+# CSS
 st.markdown("""
     <style>
         [data-testid="stSidebar"] { display: none; }
@@ -30,7 +29,6 @@ def load_data():
         df_v.columns = df_v.columns.str.strip()
         df_v['Nama Vendor'] = df_v['Nama Vendor'].ffill()
         
-        # Paksa kolom angka
         df_v['Price'] = pd.to_numeric(df_v['Price'], errors='coerce').fillna(0)
         df_v['Pax'] = pd.to_numeric(df_v['Pax'], errors='coerce').fillna(0)
         df_v['Number Review'] = pd.to_numeric(df_v['Number Review'], errors='coerce').fillna(0)
@@ -51,20 +49,18 @@ def load_data():
         st.error(f"Error loading data: {e}")
         return pd.DataFrame(), pd.DataFrame()
 
-# Jalankan Load Data
+# Load Data
 df_merged, df_raw_sentimen = load_data()
 
-# --- NAVIGASI TAB UTAMA ---
+# NAVIGASI TAB
 tab1, tab2, tab3, tab4 = st.tabs(["🔍 Cari Rekomendasi", "📊 Dashboard Analisis", "📈 System Metrics", "ℹ️ About"])
 
-# ==========================================
-# TAB 1: CARI REKOMENDASI (HALAMAN UTAMA)
-# ==========================================
+
+# TAB 1: CARI REKOMENDASI
 with tab1:
-    # --- STYLING KHUSUS HALAMAN UTAMA --- (Tetap sama)
     st.markdown("""<style>...</style>""", unsafe_allow_html=True)
 
-# --- HEADER SECTION (Update sesuai image_a473b5.png) ---
+# HEADER SECTION
     st.markdown("""
         <div style='text-align: center; padding-top: 10px;'>
             <h1 style='font-size: 50px; font-weight: 700; margin-bottom: 0px;'>
@@ -77,7 +73,7 @@ with tab1:
         <br>
     """, unsafe_allow_html=True)
 
-    # --- INPUT SECTION (CONTAINER) ---
+    # INPUT SECTION
     with st.container(border=True):
         st.write(" ") 
         col1, col2 = st.columns(2, gap="large")
@@ -100,11 +96,11 @@ with tab1:
             kota = st.selectbox("Lokasi Acara", options=df_merged['Lokasi'].dropna().unique() if not df_merged.empty else ["Data Tidak Tersedia"])
         
         with col4:
-            st.write("**Prioritas Utama Perhitungan:**")
+            st.write("Prioritas Utama:")
             prioritas = st.radio("Pilih satu:", ["Hemat Budget", "Kualitas Terbaik", "Ulasan Terbanyak"], horizontal=True, label_visibility="collapsed")
 
         st.write(" ") 
-        st.write("**Fasilitas Wajib yang Harus Tersedia:**")
+        st.write("Fasilitas Wajib yang Harus Tersedia:")
         list_fasilitas = ["Wedding Planner", "Wedding Organizer", "Catering", "Dekorasi", "Bridal", "Groom Suit", "Make Up", "Cake", "Entertainment", "Wedding Car", "Hand Bouquet", "Documentation"]
         
         select_all = st.checkbox("Pilih Semua Fasilitas")
@@ -116,12 +112,12 @@ with tab1:
         st.write(" ") 
         cari_btn = st.button("🚀 Cari Rekomendasi Terbaik untuk Weddingmu Sekarang", use_container_width=True, type="primary")
 
-    # --- PERBAIKAN DI SINI: LOGIKA MASUK KE DALAM 'WITH TAB1' ---
+    # LOGIKA TAB 1
     if cari_btn:
         if budget <= 0:
             st.warning("Silakan tentukan Budget Maksimal Anda.")
         else:
-            # 1. Salin data
+            # 1. Copy data
             df_proc = df_merged.copy()
             
             # 2. Filter Lokasi
@@ -140,21 +136,21 @@ with tab1:
             elif pax_choice == "Lainnya":
                 mask = mask & (df_proc['Pax'] >= float(pax_req))
             else:
-                # Mengambil angka dari pilihan (misal 300 dari "300 pax")
+                # Mengambil angka dari pilihan user
                 angka_pax_val = int(re.findall(r'\d+', pax_choice)[0])
                 # Vendor harus memiliki kapasitas minimal sesuai permintaan
                 mask = mask & (df_proc['Pax'] >= angka_pax_val)
 
-            # 4. Filter Fasilitas (Ganti 'dalam' menjadi 'in')
+            # 4. Filter Fasilitas
             for f in selected_fasilitas:
-            # Memastikan filter mengecek nilai 1 (integer) atau True (boolean)
+            # Pastikan filter mengecek nilai 1 (integer) atau True (boolean)
                 mask = mask & ((df_proc[f] == 1) | (df_proc[f] == True))
 
 
-            # Eksekusi Filter Akhir
+            # Filter Akhir
             hasil = df_proc[mask].copy()
 
-            # --- STEP 5: OUTPUT ---
+            # STEP 5(OUTPUT)
             if not hasil.empty:
                 st.success(f"✅ Ditemukan {len(hasil)} Vendor Terbaik untukmu!")
                 
@@ -178,14 +174,13 @@ with tab1:
                 rekomendasi = hasil.sort_values('Skor_Akhir', ascending=False).reset_index(drop=True)
                 rekomendasi.index += 1 
 
-                # Looping Card (Kodenya tetap sama seperti punya kamu)
+                # Looping Card
                 for rank, row in rekomendasi.iterrows():
                     if rank == 1: medal, badge_text, color = "🥇", "BEST MATCH", "#FFD700"
                     elif rank == 2: medal, badge_text, color = "🥈", "RECOMMENDED", "#C0C0C0"
                     else: medal, badge_text, color = "🥉", f"RANK #{rank}", "#E0E0E0"
 
                     with st.container(border=True):
-                        # ... (Seluruh kode visual card kamu tetap di sini) ...
                         h1, h2 = st.columns([3, 1])
                         h1.markdown(f"#### {medal} {row['Nama Vendor']}")
                         h2.markdown(f"<div style='text-align:right;'><span style='background-color:{color}; padding:5px 12px; border-radius:15px; font-weight:bold; color:black; font-size:12px;'>{badge_text}</span></div>", unsafe_allow_html=True)
@@ -214,9 +209,8 @@ with tab1:
             else:
                 st.error("Maaf, tidak ada vendor yang sesuai dengan kriteria tersebut.")
 
-# ==========================================
 # TAB 2: DASHBOARD SENTIMEN
-# ==========================================
+
 with tab2:
     st.title("📊 Dashboard Analisis Sentimen")
     
@@ -263,9 +257,8 @@ with tab2:
     else:
         st.info("Data sentimen belum tersedia.")
 
-# ==========================================
+
 # TAB 3: SYSTEM METRICS
-# ==========================================
 with tab3:
     st.markdown("### 📄 System Metrics & Technical Logs")
     st.caption("Spesifikasi arsitektur model, parameter hyper-tuning, dan log evaluasi klasifikasi.")
@@ -317,9 +310,7 @@ with tab3:
         dist_data = df_merged['Skor_Sentimen'].apply(get_label).value_counts()
         st.bar_chart(dist_data, color="#0083B8")
 
-# ==========================================
 # TAB 4: ABOUT SYSTEM
-# ==========================================
 with tab4:
     st.markdown("### ℹ️ Tentang Sistem Rekomendasi")
     
@@ -348,7 +339,6 @@ with tab4:
     with col_dev:
         with st.container(border=True):
             st.markdown("#### 🎓 Profil Pengembang")
-            # Ganti bagian ini dengan foto dan namamu jika perlu
             st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=100)
             st.markdown("**Nama:** Rafel")
             st.markdown("**Program Studi:** Teknik Informatika")
