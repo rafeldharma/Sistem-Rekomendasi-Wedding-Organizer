@@ -3,7 +3,7 @@ import re
 from transformers import pipeline
 
 # 1. Load IndoBERT
-print("Sedang memuat model IndoBERT... (Tunggu sebentar)")
+print("Sedang memuat model IndoBERT")
 nlp = pipeline("sentiment-analysis", model="indobenchmark/indobert-base-p2")
 
 # 2. Cleaning Teks
@@ -19,7 +19,7 @@ def clean_text(text):
 file_input = "Database_Gabungan_Lengkap.xlsx - Sheet1.csv"
 df = pd.read_excel("Database_Gabungan_Lengkap.xlsx")
 
-print("Sedang membersihkan data...")
+print("Membersihkan data")
 df['Isi_Ulasan_Clean'] = df['Isi Ulasan'].apply(clean_text)
 
 # 4. Proses Sentimen
@@ -36,7 +36,7 @@ def get_sentiment(text):
     except:
         return "Netral"
 
-print("Sedang menganalisis sentimen... (Proses ini memakan waktu)")
+print("Proses menganalisis sentimen")
 df['Sentimen'] = df['Isi_Ulasan_Clean'].apply(get_sentiment)
 
 # 5. Hasil Akhir
