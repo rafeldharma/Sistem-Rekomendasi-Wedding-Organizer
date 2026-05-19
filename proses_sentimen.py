@@ -2,11 +2,11 @@ import pandas as pd
 import re
 from transformers import pipeline
 
-# 1. Load Model IndoBERT
+# 1. Load IndoBERT
 print("Sedang memuat model IndoBERT... (Tunggu sebentar)")
 nlp = pipeline("sentiment-analysis", model="indobenchmark/indobert-base-p2")
 
-# 2. Fungsi Cleaning Teks
+# 2. Cleaning Teks
 def clean_text(text):
     if not isinstance(text, str):
         return ""
@@ -22,14 +22,14 @@ df = pd.read_excel("Database_Gabungan_Lengkap.xlsx")
 print("Sedang membersihkan data...")
 df['Isi_Ulasan_Clean'] = df['Isi Ulasan'].apply(clean_text)
 
-# 4. Proses Sentimen (Hanya untuk baris yang ada ulasannya)
+# 4. Proses Sentimen
 def get_sentiment(text):
     if text == "":
         return "Netral"
     try:
-        result = nlp(text[:512])[0] # Limit 512 karakter
+        result = nlp(text[:512])[0] # Limit di 512 karakter
         label = result['label']
-        # Pemetaan label IndoBERT base p2
+        # Labeling
         if label == "LABEL_0": return "Negatif"
         if label == "LABEL_1": return "Netral"
         return "Positif"
@@ -39,6 +39,6 @@ def get_sentiment(text):
 print("Sedang menganalisis sentimen... (Proses ini memakan waktu)")
 df['Sentimen'] = df['Isi_Ulasan_Clean'].apply(get_sentiment)
 
-# 5. Simpan Hasil
+# 5. Hasil Akhir
 df.to_excel("Hasil_Sentimen_Final.xlsx", index=False)
 print("Selesai! File 'Hasil_Sentimen_Final.xlsx' telah dibuat.")
