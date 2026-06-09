@@ -210,17 +210,11 @@ tab1, tab2, tab3, tab4 = st.tabs(["🔍 Cari Rekomendasi", "📊 Dashboard Anali
 
 # TAB 1: CARI REKOMENDASI
 with tab1:
-    st.markdown("""<style>...</style>""", unsafe_allow_html=True)
-
-# HEADER SECTION
+    # 100% MATCH HEADER TEXT STYLE
     st.markdown("""
-        <div style='text-align: center; padding-top: 10px;'>
-            <h1 style='font-size: 50px; font-weight: 700; margin-bottom: 0px;'>
-                💍 Plan Your Dream Wedding
-            </h1>
-            <p style='font-size: 20px; margin-top: 5px; font-weight: 400;'>
-                Sistem Rekomendasi Vendor Wedding Organizer
-            </p>
+        <div style='text-align: center; padding-top: 25px; padding-bottom: 25px;'>
+            <div class='wedding-title'>Plan Your Dream Wedding</div>
+            <div class='wedding-subtitle'>Sistem Rekomendasi Vendor Wedding Organizer</div>
         </div>
         <br>
     """, unsafe_allow_html=True)
@@ -231,7 +225,8 @@ with tab1:
         col1, col2 = st.columns(2, gap="large")
         with col1:
             budget = st.number_input("Budget Maksimal", min_value=0, step=1000000, value=0, format="%d", key="tab1_budget")
-            st.markdown(f"<p style='color: #0083B8; font-weight: 500;'>Terbilang: {format_rupiah(budget)}</p>", unsafe_allow_html=True)
+            # Mengubah teks terbilang ke warna hijau sage gelap agar kontras dan terbaca jelas di background krem
+            st.markdown(f"<p style='color: #2E6F40; font-weight: bold;'>Terbilang: {format_rupiah(budget)}</p>", unsafe_allow_html=True)
 
         with col2:
             pax_options = ["<100 pax", "200 pax", "300 pax", "400 pax", "500 pax", "800 pax", ">=1000 pax", "Lainnya"]
@@ -264,10 +259,10 @@ with tab1:
         st.write(" ") 
         cari_btn = st.button("🚀 Cari Rekomendasi Terbaik untuk Weddingmu Sekarang", use_container_width=True, type="primary")
 
-    # LOGIKA TAB 1
+# LOGIKA FILTERING (TAB1)
     if cari_btn:
         if budget <= 0:
-            st.warning("Silakan tentukan Budget Maksimal Anda.")
+            st.warning("Silakan Tentukan Budget Maksimal Anda.")
         else:
             # 1. Copy data
             df_proc = df_merged.copy()
@@ -278,7 +273,7 @@ with tab1:
                 (df_proc['Venue'].astype(str).str.contains(kota, case=False, na=False))
             )
 
-            # 3. Filter Harga & Pax
+            # 3. Filter harga & pax
             mask = mask & (df_proc['Price'] <= float(budget)) & (df_proc['Price'] > 0)
             
             if pax_choice == "<100 pax":
@@ -288,21 +283,19 @@ with tab1:
             elif pax_choice == "Lainnya":
                 mask = mask & (df_proc['Pax'] >= float(pax_req))
             else:
-                # Mengambil angka dari pilihan user
+                # Mengambil angka dari pilihan (misal 300 dari "300 pax")
                 angka_pax_val = int(re.findall(r'\d+', pax_choice)[0])
-                # Vendor harus memiliki kapasitas minimal sesuai permintaan
+                # Vendor harus punya kapasitas minimal sesuai input user
                 mask = mask & (df_proc['Pax'] >= angka_pax_val)
 
-            # 4. Filter Fasilitas
+            # 4. Filter fasilitas
             for f in selected_fasilitas:
-            # Pastikan filter mengecek nilai 1 (integer) atau True (boolean)
+            # Pastiin filter cek nilai 1 (integer) atau True (boolean)
                 mask = mask & ((df_proc[f] == 1) | (df_proc[f] == True))
-
-
-            # Filter Akhir
+            # Filter akhir
             hasil = df_proc[mask].copy()
 
-            # STEP 5(OUTPUT)
+            # 5. (OUTPUT) IMPLEMENTASI WSM
             if not hasil.empty:
                 st.success(f"✅ Ditemukan {len(hasil)} Vendor Terbaik untukmu!")
                 
@@ -324,29 +317,33 @@ with tab1:
                     hasil['Skor_Akhir'] = (hasil['n_review'] * 0.7) + (hasil['Skor_Sentimen'] * 0.2) + (hasil['n_price'] * 0.1)
 
                 rekomendasi = hasil.sort_values('Skor_Akhir', ascending=False).reset_index(drop=True)
-                rekomendasi.index += 1 
+                rekomendasi.index += 1
 
-                # Looping Card
+                # Looping Card (OUTPUT)
                 for rank, row in rekomendasi.iterrows():
                     if rank == 1: medal, badge_text, color = "🥇", "BEST MATCH", "#FFD700"
                     elif rank == 2: medal, badge_text, color = "🥈", "RECOMMENDED", "#C0C0C0"
                     else: medal, badge_text, color = "🥉", f"RANK {rank}", "#E0E0E0"
 
                     with st.container(border=True):
+                        # CARD INTERFACE
                         h1, h2 = st.columns([3, 1])
                         h1.markdown(f"{medal} {row['Nama Vendor']}")
                         h2.markdown(f"<div style='text-align:right;'><span style='background-color:{color}; padding:5px 12px; border-radius:15px; font-weight:bold; color:black; font-size:12px;'>{badge_text}</span></div>", unsafe_allow_html=True)
                         
                         col_info, col_action = st.columns([3, 1.5])
                         with col_info:
-                            st.markdown(f"💰 Harga: <span style='color:#0083B8; font-weight:bold; font-size:18px;'>{format_rupiah(row['Price'])}</span>", unsafe_allow_html=True)
+                            # Menyelaraskan teks warna harga menjadi Rose Gold agar senada dengan UI Baru
+                            st.markdown(f"💰 Harga: <span style='color:#B85C5C; font-weight:bold; font-size:18px;'>{format_rupiah(row['Price'])}</span>", unsafe_allow_html=True)
                             st.markdown(f"👥 Kapasitas: {int(row['Pax'])} Pax")
                             venue_info = row['Venue'] if pd.notnull(row.get('Venue')) else row['Lokasi']
                             st.markdown(f"📍 Venue: {venue_info}")
                             
+                            st.write("") # Memberikan nafas jarak vertikal tipis sebelum tag fasilitas
                             tersedia = [f for f in list_fasilitas if row.get(f) == True]
                             if tersedia:
-                                tags = "".join([f'<span style="background-color: #F0F2F6; padding: 5px 12px; margin: 4px; border-radius: 8px; font-size: 13px; border: 1px solid #D1D5DB; display: inline-block; color: #31333F;">{f}</span>' for f in tersedia])
+                                # Mengubah gaya kapsul tag agar memiliki background pink pastel lembut dengan border krem tipis yang mewah
+                                tags = "".join([f'<span style="background-color: #FDF6F6; padding: 4px 10px; margin: 4px; border-radius: 6px; font-size: 12px; border: 1px solid #EAE0DA; display: inline-block; color: #B85C5C; font-weight:500;">{f}</span>' for f in tersedia])
                                 st.markdown(f"Fasilitas:<br>{tags}", unsafe_allow_html=True)
                             else:
                                 st.markdown("Fasilitas: -")
@@ -361,6 +358,7 @@ with tab1:
             else:
                 st.error("Maaf, tidak ada vendor yang sesuai dengan kriteria tersebut.")
 
+
 # TAB 2: DASHBOARD SENTIMEN
 with tab2:
     st.title("📊 Dashboard Analisis Sentimen")
@@ -373,7 +371,7 @@ with tab2:
         # KPI Cards
         kpi1, kpi2, kpi3 = st.columns(3)
         with kpi1:
-            st.info("🏷️ Total Vendor")
+            st.info("🏷️Total Vendor")
             st.subheader(f"{total_vendor} Vendor")
         with kpi2:
             st.success("💬 Total Ulasan")
@@ -469,14 +467,14 @@ with tab4:
     
     with col_desc:
         with st.container(border=True):
-            st.markdown("#### 📝 Deskripsi Program")
+            st.markdown("📝 Deskripsi Program")
             st.write("""
             Sistem ini dirancang untuk membantu calon pengantin dalam menemukan Vendor Wedding Organizer (WO) terbaik 
             yang sesuai dengan kriteria budget, kapasitas tamu (pax), lokasi, serta kebutuhan fasilitas tertentu.
             
             Fitur Utama:
-            - Filtering: Menyaring data vendor berdasarkan input spesifik pengguna.
-            - Analisis Sentimen: Mengintegrasikan ulasan asli dari platform Bridestory menggunakan model IndoBERT untuk mengetahui tingkat kepuasan pelanggan secara otomatis.
+            - Filtering Cerdas: Menyaring data vendor berdasarkan input spesifik pengguna.
+            - Analisis Sentimen: Mengintegrasikan ulasan asli dari platform Bridestory menggunakan model **IndoBERT** untuk mengetahui tingkat kepuasan pelanggan secara otomatis.
             - Metode WSM (Weighted Sum Model): Melakukan perankingan vendor secara objektif berdasarkan bobot prioritas (Budget, Kualitas/Sentimen, atau Popularitas).
             """)
             
