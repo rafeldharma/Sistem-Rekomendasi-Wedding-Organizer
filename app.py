@@ -1,12 +1,35 @@
 import streamlit as st
 import pandas as pd
 import re
+import base64
 
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
 def parse_angka(teks):
     return int(re.sub(r'\D', '', teks)) if teks else 0
+
+# 1. Konfigurasi Halaman (Harus di baris paling atas)
+st.set_page_config(layout="wide")
+
+# 2. Fungsi untuk memuat logo dari folder lokal
+def get_image_base64(path):
+    with open(path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode()
+
+#Menampilkan Logo WeddMate
+try:
+    logo_base64 = get_image_base64("WeddMate LOGO.png")
+    st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 10px 0px 20px 0px;">
+            <img src="data:image/png;base64,{logo_base64}" width="180" style="margin-right: -40px;">
+            <div style="font-family: 'Playfair Display', serif; font-size: 30px; color: #6D3528; font-weight:600; letter-spacing: 0.5px; font-style:italic,">
+                WeddMate
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+except FileNotFoundError:
+    st.error("File 'WeddMate LOGO.png' tidak ditemukan.")
 
 # KONFIGURASI HALAMAN
 st.set_page_config(page_title="Rekomendasi WO - Rafel", layout="wide")
