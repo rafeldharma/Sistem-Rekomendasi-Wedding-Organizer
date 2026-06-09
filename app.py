@@ -35,6 +35,7 @@ except FileNotFoundError:
 st.set_page_config(page_title="Rekomendasi WO - Rafel", layout="wide")
 
 # CSS
+
 st.markdown(f"""
     <style>
         /* Impor Font: Great Vibes (Signature) & Crimson Pro */
@@ -158,29 +159,40 @@ st.markdown(f"""
             fill: #6D3528 !important;             /* Memastikan warna ikon (x) terisi penuh */
         }}
         
-        /* =====================================================================
-        🎯 BAGIAN KODE: TOMBOL UTAMA "CARI REKOMENDASI" MENJADI WARNA PUTIH
+/* =====================================================================
+        🎯 BAGIAN KODE: TOMBOL UTAMA CORAL + TEKS WAJIB PUTIH & ITALIC
         ===================================================================== */
         div.stButton > button[kind="primary"] {{
-            background-color: #FFFFFF !important; /* Mengubah total warna tombol menjadi putih bersih */
-            border: 1px solid #FCD1C6 !important; /* Garis tepi tipis warna Blush agar tombol tidak mati */
-            color: #6D3528 !important;            /* Mengubah warna teks di dalam tombol menjadi Mauve (Crimson Pro) */
-            font-family: 'Crimson Pro', serif !important; /* Memastikan font tombol menggunakan Crimson Pro */
-            font-weight: 500 !important;          /* Ketebalan teks sedang (Medium) agar rapi */
-            font-size: 18px !important;           /* Ukuran teks seimbang */
-            border-radius: 6px !important;         /* Lengkungan sudut tombol yang halus */
+            background-color: #EB9A8D !important; /* Warna coral/salmon asli mockup */
+            border: none !important;              
+            border-radius: 6px !important;         
             padding: 12px 30px !important;
-            transition: all 0.3s ease;            /* Efek transisi halus saat disentuh kursor */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important; /* Bayangan tipis yang elegan */
+            transition: all 0.3s ease;            
+            box-shadow: 0 4px 12px rgba(235, 154, 141, 0.3) !important; 
         }}
 
-        /* Efek saat kursor diletakkan di atas tombol (Hover) */
+        /* Memaksa elemen teks terdalam di tombol agar berwarna putih dan miring (italic) */
+        div.stButton > button[kind="primary"], 
+        div.stButton > button[kind="primary"] p, 
+        div.stButton > button[kind="primary"] span,
+        div.stButton > button[kind="primary"] div {{
+            color: #FFFFFF !important;            /* Mutlak warna putih */
+            font-family: 'Crimson Pro', serif !important; 
+            font-style: italic !important;        /* Membuat teks menjadi miring */
+            font-weight: 500 !important;          
+            font-size: 18px !important;           
+        }}
+
+        /* Efek saat kursor berada di atas tombol (Hover) */
         div.stButton > button[kind="primary"]:hover {{
-            background-color: #FCD1C6 !important; /* Berubah menjadi Blush lembut saat di-hover */
-            color: #6D3528 !important;            /* Teks tetap berwarna Mauve */
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important; /* Bayangan sedikit menebal */
+            background-color: #AF675B !important; /* Berubah menjadi dusty rose tua */
+            box-shadow: 0 6px 16px rgba(175, 103, 91, 0.4) !important;
         }}
-
+        
+        div.stButton > button[kind="primary"]:hover p,
+        div.stButton > button[kind="primary"]:hover span {{
+            color: #FFFFFF !important;            /* Teks tetap putih saat di-hover */
+        }}
         /* Kustomisasi Tabel */
         .stTable table {{
             font-family: 'Crimson Pro', serif !important;
