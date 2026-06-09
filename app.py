@@ -12,12 +12,164 @@ def parse_angka(teks):
 st.set_page_config(page_title="Rekomendasi WO - Rafel", layout="wide")
 
 # CSS
-st.markdown("""
+st.markdown(f"""
     <style>
-        [data-testid="stSidebar"] { display: none; }
-        .stTabs [data-baseweb="tab-list"] { gap: 24px; }
-        .stTabs [data-baseweb="tab"] { height: 50px; white-space: pre-wrap; font-weight: bold; font-size: 16px; }
-        .main-header { text-align: center; color: #FF4B4B; padding-bottom: 20px; }
+        /* Impor Font: Great Vibes (Signature) & Crimson Pro */
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Great+Vibes&display=swap');
+
+        /* 1. Menghilangkan Sidebar */
+        [data-testid="stSidebar"] {{ 
+            display: none !important; 
+        }}
+        
+        /* 2. Backdrop Utama Aplikasi - GAMBAR DIHAPUS */
+        .stApp {{
+            background-color: #F7E4D3 !important; /* Murni warna krem pastel tanpa bayangan gambar */
+            font-family: 'Crimson Pro', serif !important;
+        }}
+        
+        /* Gaya Judul Signature (Plan Your Dream Wedding) - Tetap Bold Alami */
+        .wedding-title {{
+            font-family: 'Great Vibes', cursive !important;
+            font-size: 80px !important; 
+            font-weight: 400 !important;
+            color: #6D3528 !important; 
+            line-height: 1.1 !important;
+            margin-bottom: 5px !important;
+        }}
+        
+        /* Gaya Sub-Judul (Sistem Rekomendasi...) - Tanpa Bold */
+        .wedding-subtitle {{
+            font-family: 'Crimson Pro', serif !important;
+            font-size: 20px !important;
+            font-style: italic !important; 
+            font-weight: 400 !important; /* Regular/Tidak Bold */
+            color: #6D3528 !important;
+            letter-spacing: 0.5px !important;
+            margin-top: 0px !important;
+        }}
+
+        /* 3. Kustomisasi Semua Label (Budget Maksimal, Jumlah Tamu, dll) - TIDAK BOLD */
+        label[data-testid="stWidgetLabel"] p, .stRadio p {{
+            font-family: 'Crimson Pro', serif !important;
+            color: #6D3528 !important; 
+            font-style: italic !important; 
+            font-weight: 400 !important; 
+            font-size: 18px !important;
+        }}
+        
+        /* 4. Kolom Input & Dropdown - DIUBAH JADI TIDAK BOLD */
+        div[data-baseweb="select"], div[data-baseweb="input"], .stNumberInput input {{
+            background-color: #FFFFFF !important;
+            border: none !important; 
+            border-radius: 6px !important;
+            color: #6D3528 !important; 
+            font-family: 'Crimson Pro', serif !important;
+            font-size: 16px !important;
+            font-weight: 400 !important; /* Menggunakan bobot regular agar tulisan inputan tipis elegan */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        }}
+        
+        /* 5. Custom Teks Radio Button - DIUBAH JADI TIDAK BOLD */
+        div[data-testid="stMarkdownContainer"] p {{
+            font-family: 'Crimson Pro', serif !important;
+            color: #6D3528 !important;
+            font-weight: 400 !important; /* Memastikan teks pilihan radio tidak tebal */
+        }}
+        
+        /* 6. Mengatur Gaya Tab Navigasi Atas */
+        .stTabs [data-baseweb="tab-list"] {{ 
+            gap: 24px; 
+            border-bottom: 1px solid #FCD1C6; 
+            background-color: transparent;
+        }}
+        .stTabs [data-baseweb="tab"] {{ 
+            font-family: 'Crimson Pro', serif !important;
+            font-weight: 400 !important; /* Tab tidak bold */
+            font-size: 16px;
+            color: #AF675B;
+        }}
+        .stTabs [data-baseweb="tab"][aria-selected="true"] {{
+            color: #6D3528 !important; 
+            font-weight: 600 !important; /* Hanya tab aktif yang sedikit tegas agar user tahu posisi tab */
+            border-bottom-color: #6D3528 !important;
+        }}
+        
+        /* 7. Menghilangkan Box Kontainer Tebal (Seamless) */
+        div[data-testid="stDataframeCard"], div.stElementContainer div[data-is-border="true"] {{
+            border: none !important; 
+            background-color: transparent !important; 
+            box-shadow: none !important;
+            padding: 10px 0px !important;
+        }}
+        /* 6. FORCE FIX: CHECKBOX & FONT CRIMSON PRO */
+        div[data-testid="stCheckbox"] [role="checkbox"] {{
+            border-color: #6D3528 !important; /* Warna garis tepi (border) kotak saat belum dicentang */
+        }}
+        div[data-testid="stCheckbox"] [role="checkbox"][aria-checked="true"] div {{
+            background-color: #6D3528 !important; /* Warna latar belakang kotak saat dicentang (Mauve) */
+            border-color: #6D3528 !important;     /* Warna border kotak saat dicentang */
+        }}
+        div[data-testid="stCheckbox"] [role="checkbox"][aria-checked="true"] svg {{
+            color: #FFFFFF !important;             /* Warna ikon tanda centang (✓) di dalam kotak */
+        }}
+        
+        /* KAPSUL MULTISELECT & FONT CRIMSON PRO */
+        div[data-baseweb="tag"], span[data-baseweb="tag"], .stMultiSelect span[data-baseweb="tag"] {{
+            background-color: #FCD1C6 !important; /* Warna latar belakang kapsul (Blush Lembut, bukan merah) */
+            border: 1px solid #AF675B !important; /* Warna garis tepi (border) kapsul (Dusty Rose) */
+            border-radius: 4px !important;
+        }}
+
+        /* Mengubah warna tulisan fasilitas di dalam border (Bridal, Catering, Groom Suit, dll) */
+        div[data-baseweb="tag"] span, span[data-baseweb="tag"] span, .stMultiSelect span[data-baseweb="tag"] span {{
+            color: #6D3528 !important;            /* Warna teks pilihan menjadi Mauve (tidak merah) */
+            font-family: 'Crimson Pro', serif !important; /* Memaksa font menggunakan Crimson Pro */
+            font-weight: 400 !important;          /* Bobot font regular (tidak bold) */
+            font-size: 15px !important;
+        }}
+
+        /* Mengubah warna tombol silang (x) penghapus pilihan di dalam kapsul */
+        div[data-baseweb="tag"] button, span[data-baseweb="tag"] button, div[data-baseweb="tag"] svg, span[data-baseweb="tag"] svg {{
+            color: #6D3528 !important;            /* Warna tombol (x) mengikuti teks Mauve */
+            fill: #6D3528 !important;             /* Memastikan warna ikon (x) terisi penuh */
+        }}
+        
+        /* =====================================================================
+        🎯 BAGIAN KODE: TOMBOL UTAMA "CARI REKOMENDASI" MENJADI WARNA PUTIH
+        ===================================================================== */
+        div.stButton > button[kind="primary"] {{
+            background-color: #FFFFFF !important; /* Mengubah total warna tombol menjadi putih bersih */
+            border: 1px solid #FCD1C6 !important; /* Garis tepi tipis warna Blush agar tombol tidak mati */
+            color: #6D3528 !important;            /* Mengubah warna teks di dalam tombol menjadi Mauve (Crimson Pro) */
+            font-family: 'Crimson Pro', serif !important; /* Memastikan font tombol menggunakan Crimson Pro */
+            font-weight: 500 !important;          /* Ketebalan teks sedang (Medium) agar rapi */
+            font-size: 18px !important;           /* Ukuran teks seimbang */
+            border-radius: 6px !important;         /* Lengkungan sudut tombol yang halus */
+            padding: 12px 30px !important;
+            transition: all 0.3s ease;            /* Efek transisi halus saat disentuh kursor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important; /* Bayangan tipis yang elegan */
+        }}
+
+        /* Efek saat kursor diletakkan di atas tombol (Hover) */
+        div.stButton > button[kind="primary"]:hover {{
+            background-color: #FCD1C6 !important; /* Berubah menjadi Blush lembut saat di-hover */
+            color: #6D3528 !important;            /* Teks tetap berwarna Mauve */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important; /* Bayangan sedikit menebal */
+        }}
+
+        /* Kustomisasi Tabel */
+        .stTable table {{
+            font-family: 'Crimson Pro', serif !important;
+        }}
+        .stTable table thead tr th {{
+            background-color: #6D3528 !important;
+            color: #F7E4D3 !important;
+            font-weight: 500 !important; /* Header tabel disesuaikan */
+        }}
+        .stTable table tbody tr td {{
+            font-weight: 400 !important; /* Isi data tabel regular */
+        }}
     </style>
 """, unsafe_allow_html=True)
 
